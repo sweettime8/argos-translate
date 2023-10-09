@@ -7,6 +7,7 @@ import urllib.request
 import zipfile
 from pathlib import Path
 from threading import Lock
+import os
 
 import packaging.version
 
@@ -333,9 +334,12 @@ def update_package_index():
 
 def get_available_packages() -> list[AvailablePackage]:
     """Returns a list of AvailablePackages from the package index."""
-
+    #mrd thêm :
+    base_dir = os.getcwd()
+    path_package_index = os.path.join(base_dir, "package_index", "index.json")
     try:
-        with open(settings.local_package_index) as index_file:
+        #with open(settings.local_package_index) as index_file:
+        with open(path_package_index) as index_file:
             index = json.load(index_file)
             packages = []
             for metadata in index:
