@@ -1,0 +1,3 @@
+Dịch hỗ trợ cài đặt các gói ngôn ngữ mà là zip
+lưu trữ với phần mở rộng ".argosmodel" chứa dữ liệu cần thiết cho
+Dịch. LibreTranslate là một API và web-app được xây dựng trên bản dịch Argos.

@@ -1,0 +1,3 @@
+Translate supports installing language model packages which are zip
+archives with a ".argosmodel" extension containing the data needed for
+translation. LibreTranslate is an API and web-app built on top of Argos Translate.

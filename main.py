@@ -1,14 +1,16 @@
 import argostranslate.package
 import argostranslate.translate
+
+from argostranslatefiles.argostranslatefiles import argostranslatefiles
 import os
 
-from_code = "vi"
-to_code = "en"
+from_code = "en"
+to_code = "vi"
 
 available_packages = argostranslate.package.get_available_packages()
-print("############# available_packages ##########################")
-for item in available_packages:
-    print(item)
+# print("############# available_packages ##########################")
+# for item in available_packages:
+#     print(item)
 available_package = list(
     filter(
         lambda x: x.from_code == from_code and x.to_code == to_code, available_packages
@@ -30,31 +32,18 @@ to_lang = list(filter(
     installed_languages))[0]
 translation = from_lang.get_translation(to_lang)
 text_eng = f"""
-Open-source offline translation library written in Python
-
-Argos Translate uses OpenNMT for translations and can be used as 
-either a Python library, command-line, or GUI application. Argos 
-Translate supports installing language model packages which are zip 
-archives with a ".argosmodel" extension containing the data needed for 
-translation. LibreTranslate is an API and web-app built on top of Argos Translate.
-
-Argos Translate also manages automatically pivoting through intermediate 
-languages to translate between languages that don't have a direct translation 
-between them installed. For example, if you have a es → en and en → fr translation
- installed you are able to translate from es → fr as if you had that translation
-  installed. This allows for translating between a wide variety of languages at 
-  the cost of some loss of translation quality.
-
+My biggest weakness is that I sometimes get so caught up in the details. 
+I’ve been trying to improve in this aspect by checking in with myself regularly and reminding myself to refocus on the big picture. 
+This way I can still ensure the quality of my work without impacting my productivity.
 """
 
-text_vi = f"""Dường như ngày ấy Trên xe buýt có ai đã khóc nức nở 
-Tiếng nức nở Hòa cùng cơn mưa rơi trên đường về Góc phố quen nhuộm màu cô đơn Hàng cây giờ có thêm lá héo Đã xa thật rồi Ôi kỷ niệm, đừng trở thành quá khứ... 
-Dường như ngày ấy Trên xe buýt, ai đó đã khóc lớn Mặt trời dường như ngừng hát Khi thiếu người ngồi bên cạnh Điểm dừng chân tiếp theo Tự hỏi liệu chúng ta có gặp lại nhau Hay màu sắc sẽ phai theo thời gian Những năm tháng ấy dần tan biến Nhưng dù sao, trên xe buýt, bạn không nên khóc to...
-Dường như ngày ấy Trên xe buýt có ai đã khóc nức nở 
-Tiếng nức nở Hòa cùng cơn mưa rơi trên đường về Góc phố quen nhuộm màu cô đơn Hàng cây giờ có thêm lá héo Đã xa thật rồi Ôi kỷ niệm, đừng trở thành quá khứ... 
-Dường như ngày ấy Trên xe buýt, ai đó đã khóc lớn Mặt trời dường như ngừng hát Khi thiếu người ngồi bên cạnh Điểm dừng chân tiếp theo Tự hỏi liệu chúng ta có gặp lại nhau Hay màu sắc sẽ phai theo thời gian Những năm tháng ấy dần tan biến Nhưng dù sao, trên xe buýt, bạn không nên khóc to..."""
-translatedText = translation.translate(text_vi)
+text_vi = f"""
+Điểm yếu lớn nhất của tôi là đôi khi tôi bị cuốn vào các chi tiết. 
+Tôi đã cố gắng cải thiện trong phương diện này bằng cách tự kiểm tra bản thân thường xuyên và nhắc nhở bản thân trung lại vào tổng quan công việc. 
+Bằng cách này, tôi vẫn có thể đảm bảo chất lượng công việc mà không ảnh hưởng đến năng suất của mình
+"""
+translatedText = translation.translate(text_eng)
 print("############# translatedText ##########################")
 print(translatedText)
 
-# '¡Hola Mundo!'
+argostranslatefiles.translate_file(translation, os.path.abspath('datatest/test.txt'))

@@ -1,10 +1,3 @@
-# packages dir
-packages/
-data_snap/packages
-
-# Swap file
-*.swp
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -134,15 +127,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
-# Snapcraft
-*.snap
-
-# IDE files
-.idea/
-
-# log files
-logfile.txt
-
-/translate_data_model/**
-/.idea/**

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKU translate</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.min.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/filepond.css')}}">
+    <script src="{{url_for('static', filename='js/filepond-plugin-file-validate-type.js')}}"></script>
+    <script src="{{url_for('static', filename='js/filepond.js')}}"></script>
+    <script src="{{url_for('static', filename='css/bootstrap.min.js')}}"></script>
+    <style>
+        .spinner-border-sm {
+            display: none;
+        }
+
+        .style-loading {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="style-header">
+    <div class="container ">
+        <div class="row mb-3">
+            <div class="col style-logo">
+                <img src="../static/image/logo.png" alt="">
+                <h3 class="style-title">SKU Translate </h3>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <form name="form-translate">
+        <div class="list-button">
+            <button type="button" id="btn-text" class="btn btn-primary" onclick="handleChangeTypeTranslate('text')">
+                <img src="../static/image/book-open.svg" alt="">
+                Văn bản
+            </button>
+            <button type="button" id="btn-file" class="btn btn-outline-primary"
+                    onclick="handleChangeTypeTranslate('file')">
+                <img src="../static/image/upload.svg" alt="">
+                Tài liệu
+            </button>
+            <button type="button" id="btn-image" class="btn btn-outline-primary"
+                    onclick="handleChangeTypeTranslate('image')">
+                <img src="../static/image/image.svg" alt="">
+                Hình ảnh
+            </button>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <input type="file" id="filepond">
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn  btn-success" onclick="translateFile()">
+                    Check
+                </button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                            <input type="radio" class="btn-check" onclick="hanldeChooseFromLanguage('en')" value="en"
+                                   name="btnleft" id="btnleft1"
+                                   autocomplete="off" checked>
+                            <label class="btn btn-outline-primary" for="btnleft1">Anh</label>
+
+                            <input type="radio" class="btn-check" onclick="hanldeChooseFromLanguage('vi')" value="vi"
+                                   name="btnleft" id="btnleft2"
+                                   autocomplete="off">
+                            <label class="btn btn-outline-primary" for="btnleft2">Việt</label>
+
+                            <input type="radio" class="btn-check" onclick="hanldeChooseFromLanguage('ja')" value="ja"
+                                   name="btnleft" id="btnleft3"
+                                   autocomplete="off">
+                            <label class="btn btn-outline-primary" for="btnleft3">Nhật</label>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <textarea id="from-text-editor" name="from-text-editor" class="form-control" rows="15"
+                                  aria-label="With textarea">{{from_text}}</textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="card" aria-hidden="true">
+                    <div class="card-header">
+                        <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                            <input type="radio" class="btn-check" onclick="hanldeChooseToLanguage('en')" value="en"
+                                   name="btnright" id="btnright1" autocomplete="off"
+                            >
+                            <label class="btn btn-outline-primary" for="btnright1">Anh</label>
+
+                            <input checked type="radio" class="btn-check" onclick="hanldeChooseToLanguage('vi')"
+                                   value="vi" name="btnright" id="btnright2" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="btnright2">Việt</label>
+
+                            <input type="radio" class="btn-check" onclick="hanldeChooseToLanguage('ja')" value="ja"
+                                   name="btnright" id="btnright3" autocomplete="off">
+                            <label class="btn btn-outline-primary" for="btnright3">Nhật</label>
+                        </div>
+                        <button class="btn btn-primary float-end" onclick="startTranslate()">
+                            <span id="spinner" class="spinner-border spinner-border-sm" role="status"></span>
+                            Translate
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <textarea id="to-text-editor" name="to-text-editor" disabled class="form-control" rows="15"
+                                  aria-label="With textarea">{{to_text}}</textarea>
+                        <div id="loading" class="style-loading">
+                            <h3>Loading ...</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    var currentType = "text";
+
+    async function startTranslate() {
+        event.preventDefault();
+        // Show Icon loading
+        document.getElementById('spinner').style.display = 'inline-block';
+        document.getElementById("to-text-editor").style.display = 'none';
+        document.getElementById("loading").style.display = 'flex';
+        const form_data = {
+            from_code: document.forms["form-translate"]["btnleft"].value,
+            to_code: document.forms["form-translate"]["btnright"].value,
+            from_text: document.forms["form-translate"]["from-text-editor"].value
+        }
+
+        try {
+            // Gửi request POST đến Flask route "/translate"
+            const response = await fetch('/translate', {
+                method: 'POST',
+                body: new URLSearchParams(form_data),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            });
+            // Chuyển đổi response thành JSON
+            const data = await response.json();
+            document.getElementById("to-text-editor").value = data.data
+            document.getElementById('spinner').style.display = 'none';
+            document.getElementById("to-text-editor").style.display = 'block';
+            document.getElementById("loading").style.display = 'none';
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    function handleChangeTypeTranslate(type) {
+        if (type != currentType) {
+            var btnText = document.getElementById("btn-text")
+            var btnFile = document.getElementById("btn-file")
+            var btnImage = document.getElementById("btn-image")
+            if (type == 'text') {
+                btnText.classList.remove("btn-outline-primary")
+                btnText.classList.add("btn-primary")
+                btnFile.classList.remove("btn-primary")
+                btnFile.classList.add("btn-outline-primary")
+                btnImage.classList.remove("btn-primary")
+                btnImage.classList.add("btn-outline-primary")
+                currentType = 'text';
+            } else if (type == 'file') {
+                btnFile.classList.remove("btn-outline-primary")
+                btnFile.classList.add("btn-primary")
+                btnText.classList.remove("btn-primary")
+                btnText.classList.add("btn-outline-primary")
+                btnImage.classList.remove("btn-primary")
+                btnImage.classList.add("btn-outline-primary")
+                currentType = 'file';
+            } else {
+                btnImage.classList.remove("btn-outline-primary")
+                btnImage.classList.add("btn-primary")
+                btnText.classList.remove("btn-primary")
+                btnText.classList.add("btn-outline-primary")
+                btnFile.classList.remove("btn-primary")
+                btnFile.classList.add("btn-outline-primary")
+                currentType = 'image';
+            }
+        }
+    }
+
+    function hanldeChooseFromLanguage(language) {
+        if (language == document.forms["form-translate"]["btnright"].value) {
+            if (language == 'en') {
+                document.forms["form-translate"]["btnright"].value = "vi"
+            } else {
+                document.forms["form-translate"]["btnright"].value = "en"
+            }
+        }
+    }
+
+    function hanldeChooseToLanguage(language) {
+        if (language == document.forms["form-translate"]["btnleft"].value) {
+            if (language == 'en') {
+                document.forms["form-translate"]["btnleft"].value = "vi"
+            } else {
+                document.forms["form-translate"]["btnleft"].value = "en"
+            }
+        }
+    }
+</script>
+<script>
+
+    let inputElement = document.getElementById('filepond');
+    // Khởi tạo FilePond với các tùy chọn
+    FilePond.registerPlugin(FilePondPluginFileValidateType)
+    fileAccepted = [
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.ms-excel",
+        "application/vnd.oasis.opendocument.spreadsheet",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/pdf",
+        'text/plain',
+    ]
+
+    let pond = FilePond.create(inputElement, {
+        allowMultiple: false, // Cho phép chọn nhiều tệp
+        allowReorder: true, // Cho phép sắp xếp lại thứ tự tệp đã chọn
+        maxFiles: 10, // Số lượng tệp tối đa cho phép
+        maxFileSize: '3MB', // Dung lượng tối đa cho mỗi tệp
+        maxTotalFileSize: '10MB', // Tổng dung lượng tối đa của tất cả tệp
+        maxFilepondSize: '3MB', // Dung lượng tối đa của mỗi tệp
+        acceptedFileTypes: fileAccepted,
+        labelFileTypeNotAllowed: 'Tệp không đúng định dạng',
+        server: {
+            process: (fieldName, file, metadata, load, error, progress, abort) => {
+                load();
+            }
+        },
+    });
+
+    function translateFile() {
+        console.log("translateFile")
+        // Lấy tệp tin đã chọn trong FilePond
+        const files = pond.getFile();
+        // Kiểm tra xem có tệp nào được chọn không
+        if (files.length === 0) {
+            alert('Vui lòng chọn ít nhất một tệp.');
+            return;
+        }
+        console.log(files)
+        // Tạo FormData để chứa các tệp tin được chọn
+        const formData = new FormData();
+        formData.append('filepond', files.file);
+        fetch('/translate-file', {
+            method: 'POST',
+            body: formData,
+        })
+    }
+</script>
+
+</body>
+</html>

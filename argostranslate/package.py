@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import copy
 import json
+import os
 import shutil
 import urllib.request
 import zipfile
 from pathlib import Path
 from threading import Lock
-import os
 
 import packaging.version
 
@@ -154,12 +154,12 @@ class IPackage:
 
     def __eq__(self, other):
         return (
-            self.package_version == other.package_version
-            and self.argos_version == other.argos_version
-            and self.from_code == other.from_code
-            and self.from_name == other.from_name
-            and self.to_code == other.to_code
-            and self.to_name == other.to_name
+                self.package_version == other.package_version
+                and self.argos_version == other.argos_version
+                and self.from_code == other.from_code
+                and self.from_name == other.from_name
+                and self.to_code == other.to_code
+                and self.to_name == other.to_name
         )
 
     def __repr__(self):
@@ -200,11 +200,11 @@ class Package(IPackage):
         """Update the package if a newer version is available."""
         for available_package in get_available_packages():
             if (
-                available_package.from_code == self.from_code
-                and available_package.to_code == self.to_code
+                    available_package.from_code == self.from_code
+                    and available_package.to_code == self.to_code
             ):
                 if packaging.version.parse(
-                    available_package.package_version
+                        available_package.package_version
                 ) > packaging.version.parse(self.package_version):
                     new_package_path = available_package.download()
                     uninstall(self)
@@ -256,8 +256,8 @@ class AvailablePackage(IPackage):
         # Install sbd package if needed
         if self.type == "translate" and not settings.stanza_available:
             if (
-                len(list(filter(lambda x: x.type == "sbd", get_installed_packages())))
-                == 0
+                    len(list(filter(lambda x: x.type == "sbd", get_installed_packages())))
+                    == 0
             ):
                 # No sbd packages are installed, download all available
                 sbd_packages = filter(
@@ -334,11 +334,10 @@ def update_package_index():
 
 def get_available_packages() -> list[AvailablePackage]:
     """Returns a list of AvailablePackages from the package index."""
-    #mrd thêm :
     base_dir = os.getcwd()
     path_package_index = os.path.join(base_dir, "package_index", "index.json")
     try:
-        #with open(settings.local_package_index) as index_file:
+        # with open(settings.local_package_index) as index_file:
         with open(path_package_index) as index_file:
             index = json.load(index_file)
             packages = []
